@@ -19,22 +19,39 @@ eeg_bands = {
         'Gama' : (32    , 100)
         }
 
+window_size = 10
+chunk_size = 250
+
 def main():
     print("Looking for stream")
     
     inlet = StreamInlet(resolve_stream('type', 'EEG')[0])
 
+    chunk, timestamp = inlet.pull_chunk(timeout=3, max_samples=chunk_size)
+    buffer = np.array(chunk)
+
+    print("Filling buffer")
+    for i in range(window_size - 2):
+        chunk, timestamp = inlet.pull_chunk(timeout=3, max_samples=chunk_size)
+        buffer = np.concatenate((buffer, chunk))
+        print(i)
+
+    print(buffer.shape)
+    print("Processing")
     while True:
-        chunk, timestamp = inlet.pull_chunk(timeout=3, max_samples=250)
-        print(chunk)
+        chunk, timestamp = inlet.pull_chunk(timeout=3, max_samples=chunk_size)
 
-        arr = np.array(chunk)
+        buffer = np.concatenate((buffer, chunk))
 
-        f, psd = welch(arr, fs=250., nperseg=250)
+        f, psd = welch(buffer, fs=250., nperseg=8)
 
         power = {band: np.mean(psd[np.where((f >= lf) & (f <= hf))]) for band, (lf, hf) in eeg_bands.items()}
 
         print(power)
+
+        print(buffer.shape)
+        buffer = np.delete(buffer, slice(chunk_size), axis=0)
+        print(buffer.shape)
 
 if __name__ == '__main__':
     main()
