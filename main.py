@@ -29,7 +29,7 @@ def main():
     buffer = np.array(chunk).transpose()
 
     print("Filling buffer")
-    for i in range(window_size - 2):
+    for i in range(window_size - 1):
         chunk, timestamp = inlet.pull_chunk(timeout=3, max_samples=chunk_size)
         chunk = np.array(chunk).transpose()
         buffer = np.hstack((buffer, chunk))
@@ -44,7 +44,7 @@ def main():
         buffer = np.hstack((buffer, chunk))
 
         freqs, psd = welch(buffer, fs=250., nperseg=4*250)
-        psd = np.average(psd, axis=0);
+        psd = np.average(psd, axis=0)
 
         freq_res = freqs[1] - freqs[0] 
 
@@ -63,7 +63,7 @@ def main():
             if band_power[2] < band_power[1] or band_power[2] < band_power[3]:
                 alpha = False
             else:
-                print("Concentração")
+                print("Meditação")
         else:
             if band_power[2] / band_power[1] >= 1.3 and band_power[2] / band_power[3] >= 1.3:
                 alpha = True
