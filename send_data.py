@@ -4,7 +4,7 @@ from time import sleep
 
 
 def main():
-    data = open('./OpenBCI-RAW-2020-11-02_01-35-26.txt').readlines()
+    data = open('OpenBCI_GUI-v5-meditation.txt').readlines()
     info = StreamInfo('OpenBCI', 'EEG', 8, 256, 'float32', 'rp36o')
     outlet = StreamOutlet(info)
     for line in data:
